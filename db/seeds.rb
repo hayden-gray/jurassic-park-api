@@ -7,3 +7,11 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# Species required by the spec. Idempotent: safe to run repeatedly.
+{
+  "carnivore" => %w[Tyrannosaurus Velociraptor Spinosaurus Megalosaurus],
+  "herbivore" => %w[Brachiosaurus Stegosaurus Ankylosaurus Triceratops]
+}.each do |diet, names|
+  names.each { |name| Species.find_or_create_by!(name: name) { |s| s.diet = diet } }
+end

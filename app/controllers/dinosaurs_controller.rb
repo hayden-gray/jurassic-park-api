@@ -8,19 +8,28 @@ class DinosaursController < ApplicationController
   end
 
   def create
-    render json: Dinosaur.create!(dinosaur_params), status: :created
+    dinosaur = Dinosaur.new(params.permit(:name, :species_id))
+    save_with_cage(dinosaur)
+
+    render json: dinosaur, status: :created
   end
 
   def update
     dinosaur = Dinosaur.find(params[:id])
-    dinosaur.update!(dinosaur_params)
+    dinosaur.assign_attributes(params.permit(:name))
+    save_with_cage(dinosaur)
+
     render json: dinosaur
   end
 
   private
 
-  # cage_id is intentionally not permitted until the placement rules exist.
-  def dinosaur_params
-    params.permit(:name, :species_id)
+  def save_with_cage(dinosaur)
+    if params[:cage_id].present?
+      CageAssignment.call(dinosaur: dinosaur, cage_id: params[:cage_id])
+    else
+      dinosaur.cage = nil if params.key?(:cage_id)
+      dinosaur.save!
+    end
   end
 end

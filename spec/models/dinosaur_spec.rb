@@ -28,6 +28,13 @@ RSpec.describe Dinosaur, type: :model do
       .to raise_error(ActiveRecord::StatementInvalid, /dinosaurs_name_not_blank/)
   end
 
+  it "cannot change species once created" do
+    dinosaur = create(:dinosaur)
+    dinosaur.species = create(:species)
+    expect(dinosaur).not_to be_valid
+    expect(dinosaur.errors[:species_id]).to include("can't be changed")
+  end
+
   it "includes the species name and diet in JSON" do
     dinosaur = create(:dinosaur, species: create(:species, :carnivore, name: "Velociraptor"))
     expect(dinosaur.as_json).to include("species" => "Velociraptor", "diet" => "carnivore")

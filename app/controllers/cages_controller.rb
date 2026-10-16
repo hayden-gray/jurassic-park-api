@@ -1,6 +1,6 @@
 class CagesController < ApplicationController
   def index
-    cages = Cage.order(:id)
+    cages = Cage.includes(:dinosaurs).order(:id)
     cages = cages.where(power_status: params[:power_status]) if params[:power_status].present?
 
     render json: cages
@@ -16,9 +16,15 @@ class CagesController < ApplicationController
 
   def update
     cage = Cage.find(params[:id])
-    cage.update!(cage_params)
+    cage.with_lock { cage.update!(cage_params) }
 
     render json: cage
+  end
+
+  def destroy
+    cage = Cage.find(params[:id])
+    cage.with_lock { cage.destroy! }
+    head :no_content
   end
 
   private

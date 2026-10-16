@@ -79,11 +79,58 @@ RSpec.describe "Cages", type: :request do
       expect(cage.reload).to be_down
     end
 
+    it "returns 422 when powering off a cage with dinosaurs" do
+      cage = create(:cage)
+      create(:dinosaur, cage: cage)
+      patch "/cages/#{cage.id}", params: { power_status: "DOWN" }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to have_key("power_status")
+      expect(cage.reload).to be_active
+    end
+
+    it "returns 422 when lowering capacity below occupancy" do
+      cage = create(:cage, capacity: 3)
+      create_list(:dinosaur, 2, cage: cage)
+      patch "/cages/#{cage.id}", params: { capacity: 1 }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to have_key("capacity")
+    end
+
     it "returns 422 for an invalid power status" do
       cage = create(:cage)
       patch "/cages/#{cage.id}", params: { power_status: "BROKEN" }
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to have_key("power_status")
     end
+  end
+
+  describe "DELETE /cages/:id" do
+    it "deletes an empty cage" do
+      cage = create(:cage)
+      delete "/cages/#{cage.id}"
+      expect(response).to have_http_status(:no_content)
+      expect(Cage.exists?(cage.id)).to be(false)
+    end
+
+    it "returns 422 and keeps a cage that has dinosaurs" do
+      cage = create(:cage)
+      create(:dinosaur, cage: cage)
+      delete "/cages/#{cage.id}"
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to have_key("base")
+      expect(Cage.exists?(cage.id)).to be(true)
+    end
+
+    it "returns 404 for a missing cage" do
+      delete "/cages/0"
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  it "reports the dinosaur count" do
+    cage = create(:cage)
+    create_list(:dinosaur, 2, cage: cage)
+    get "/cages/#{cage.id}"
+    expect(response.parsed_body["dinosaur_count"]).to eq(2)
   end
 end

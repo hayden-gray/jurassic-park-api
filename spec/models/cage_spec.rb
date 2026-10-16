@@ -41,3 +41,35 @@ RSpec.describe Cage, type: :model do
     end
   end
 end
+
+RSpec.describe Cage, "occupancy rules", type: :model do
+  let(:cage) { create(:cage, capacity: 3) }
+
+  it "counts its dinosaurs" do
+    create_list(:dinosaur, 2, cage: cage)
+    expect(cage.dinosaur_count).to eq(2)
+  end
+
+  it "cannot be powered down while it contains dinosaurs" do
+    create(:dinosaur, cage: cage)
+    cage.power_status = "DOWN"
+    expect(cage).not_to be_valid
+  end
+
+  it "can be powered down when empty and back up" do
+    cage.update!(power_status: "DOWN")
+    expect(cage.update(power_status: "ACTIVE")).to be(true)
+  end
+
+  it "cannot lower capacity below occupancy" do
+    create_list(:dinosaur, 2, cage: cage)
+    expect(cage.update(capacity: 1)).to be(false)
+    expect(cage.update(capacity: 2)).to be(true)
+  end
+
+  it "cannot be destroyed while it contains dinosaurs" do
+    create(:dinosaur, cage: cage)
+    expect(cage.destroy).to be(false)
+    expect(cage.errors[:base]).to be_present
+  end
+end

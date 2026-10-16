@@ -6,6 +6,6 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   resources :cages, only: %i[index show create update destroy]
-  resources :species, only: :index
-  resources :dinosaurs, only: %i[index show create update]
+  resources :species, only: %i[index create update destroy]
+  resources :dinosaurs, only: %i[index show create update destroy]
 end

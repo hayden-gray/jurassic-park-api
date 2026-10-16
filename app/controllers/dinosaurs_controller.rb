@@ -26,6 +26,11 @@ class DinosaursController < ApplicationController
     render json: dinosaur
   end
 
+  def destroy
+    Dinosaur.find(params[:id]).destroy!
+    head :no_content
+  end
+
   private
 
   def save_with_cage(dinosaur)

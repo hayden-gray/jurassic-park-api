@@ -158,4 +158,19 @@ RSpec.describe "Dinosaurs", type: :request do
       expect(response).to have_http_status(:unprocessable_content)
     end
   end
+
+  describe "DELETE /dinosaurs/:id" do
+    it "deletes the dinosaur and frees its spot in the cage" do
+      cage = create(:cage, capacity: 1)
+      dinosaur = create(:dinosaur, cage: cage)
+      delete "/dinosaurs/#{dinosaur.id}"
+      expect(response).to have_http_status(:no_content)
+      expect(cage.dinosaur_count).to eq(0)
+    end
+
+    it "returns 404 when missing" do
+      delete "/dinosaurs/0"
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

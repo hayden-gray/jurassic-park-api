@@ -26,4 +26,11 @@ RSpec.describe Species, type: :model do
     dinosaur = create(:dinosaur)
     expect(dinosaur.species.destroy).to be(false)
   end
+
+  it "cannot change diet once created" do
+    species = create(:species, diet: "herbivore")
+    species.diet = "carnivore"
+    expect(species).not_to be_valid
+    expect(species.errors[:diet]).to include("can't be changed")
+  end
 end

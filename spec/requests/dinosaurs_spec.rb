@@ -59,6 +59,53 @@ RSpec.describe "Dinosaurs", type: :request do
     end
   end
 
+  describe "GET /dinosaurs filters" do
+    let(:trike) { create(:species, name: "Trike") }
+    let(:steg) { create(:species, name: "Steg") }
+    let(:cage) { create(:cage) }
+    let!(:in_cage) { create(:dinosaur, species: trike, cage: cage) }
+    let!(:loose_trike) { create(:dinosaur, species: trike) }
+    let!(:loose_steg) { create(:dinosaur, species: steg) }
+
+    def ids_for(filter)
+      get "/dinosaurs", params: { filter: filter }
+      response.parsed_body.map { |d| d["id"] }
+    end
+
+    it "filters by species" do
+      expect(ids_for(species_id: trike.id)).to contain_exactly(in_cage.id, loose_trike.id)
+    end
+
+    it "filters by cage" do
+      expect(ids_for(cage_id: cage.id)).to eq([in_cage.id])
+    end
+
+    it "returns 422 when a filter is given a list" do
+      get "/dinosaurs", params: { filter: { species_id: [trike.id, steg.id] } }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]["filter"].first).to include("single value")
+    end
+
+    it "combines filters" do
+      expect(ids_for(species_id: trike.id, cage_id: cage.id)).to eq([in_cage.id])
+    end
+
+    it "returns an empty list when nothing matches" do
+      expect(ids_for(cage_id: 0)).to eq([])
+    end
+
+    it "returns 422 for an unknown filter key" do
+      get "/dinosaurs", params: { filter: { specis_id: trike.id } }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to have_key("filter")
+    end
+
+    it "returns 422 when filter is not an object" do
+      get "/dinosaurs", params: { filter: "trike" }
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+  end
+
   describe "GET /dinosaurs/:id" do
     it "returns the dinosaur" do
       dinosaur = create(:dinosaur)

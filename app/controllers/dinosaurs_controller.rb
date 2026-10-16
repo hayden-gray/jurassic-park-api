@@ -1,6 +1,10 @@
 class DinosaursController < ApplicationController
+  include Filterable
+
+  FILTERS = %i[id species_id cage_id].freeze
+
   def index
-    render json: Dinosaur.includes(:species).order(:id)
+    render json: Dinosaur.includes(:species).where(filter_params(FILTERS)).order(:id)
   end
 
   def show

@@ -1,9 +1,10 @@
 class CagesController < ApplicationController
-  def index
-    cages = Cage.includes(:dinosaurs).order(:id)
-    cages = cages.where(power_status: params[:power_status]) if params[:power_status].present?
+  include Filterable
 
-    render json: cages
+  FILTERS = %i[id power_status].freeze
+
+  def index
+    render json: Cage.includes(:dinosaurs).where(filter_params(FILTERS)).order(:id)
   end
 
   def show

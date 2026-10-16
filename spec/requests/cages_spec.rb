@@ -31,21 +31,27 @@ RSpec.describe "Cages", type: :request do
     it "filters by power status" do
       active = create(:cage)
       create(:cage, :down)
-      get "/cages", params: { power_status: "ACTIVE" }
+      get "/cages", params: { filter: { power_status: "ACTIVE" } }
       expect(response.parsed_body.map { |c| c["id"] }).to eq([active.id])
     end
 
     it "returns an empty list for an unknown power status filter" do
       create(:cage)
-      get "/cages", params: { power_status: "BROKEN" }
+      get "/cages", params: { filter: { power_status: "BROKEN" } }
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body).to eq([])
+    end
+
+    it "returns 422 for an unknown filter key" do
+      get "/cages", params: { filter: { power_stauts: "DOWN" } }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]["filter"].first).to include("power_stauts")
     end
 
     it "accepts a lowercase power status filter" do
       create(:cage)
       down = create(:cage, :down)
-      get "/cages", params: { power_status: "down" }
+      get "/cages", params: { filter: { power_status: "down" } }
       expect(response.parsed_body.map { |c| c["id"] }).to eq([down.id])
     end
 

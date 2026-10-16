@@ -3,6 +3,10 @@ class ApplicationController < ActionController::API
     render json: { errors: e.record.errors.to_hash }, status: :unprocessable_content
   end
 
+  rescue_from Filterable::InvalidFilter do |e|
+    render json: { errors: { filter: [e.message] } }, status: :unprocessable_content
+  end
+
   rescue_from ActiveRecord::RecordNotDestroyed do |e|
     render json: { errors: e.record.errors.to_hash }, status: :unprocessable_content
   end

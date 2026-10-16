@@ -77,17 +77,17 @@ RSpec.describe "Dinosaurs", type: :request do
     end
 
     it "filters by cage" do
-      expect(ids_for(cage_id: cage.id)).to eq([in_cage.id])
+      expect(ids_for(cage_id: cage.id)).to eq([ in_cage.id ])
     end
 
     it "returns 422 when a filter is given a list" do
-      get "/dinosaurs", params: { filter: { species_id: [trike.id, steg.id] } }
+      get "/dinosaurs", params: { filter: { species_id: [ trike.id, steg.id ] } }
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]["filter"].first).to include("single value")
     end
 
     it "combines filters" do
-      expect(ids_for(species_id: trike.id, cage_id: cage.id)).to eq([in_cage.id])
+      expect(ids_for(species_id: trike.id, cage_id: cage.id)).to eq([ in_cage.id ])
     end
 
     it "returns an empty list when nothing matches" do

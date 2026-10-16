@@ -4,7 +4,7 @@ class ApplicationController < ActionController::API
   end
 
   rescue_from Filterable::InvalidFilter do |e|
-    render json: { errors: { filter: [e.message] } }, status: :unprocessable_content
+    render json: { errors: { filter: [ e.message ] } }, status: :unprocessable_content
   end
 
   rescue_from ActiveRecord::RecordNotDestroyed do |e|
@@ -12,6 +12,6 @@ class ApplicationController < ActionController::API
   end
 
   rescue_from ActiveRecord::RecordNotFound do |e|
-    render json: { errors: { base: ["#{e.model || 'Record'} not found"] } }, status: :not_found
+    render json: { errors: { base: [ "#{e.model || 'Record'} not found" ] } }, status: :not_found
   end
 end

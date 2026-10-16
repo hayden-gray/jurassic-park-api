@@ -93,7 +93,7 @@ RSpec.describe CageAssignment do
   it "reports model validation errors before checking the cage" do
     dinosaur = build(:dinosaur, name: nil)
     expect { assign(dinosaur) }.to raise_error(ActiveRecord::RecordInvalid)
-    expect(dinosaur.errors.attribute_names).to eq([:name])
+    expect(dinosaur.errors.attribute_names).to eq([ :name ])
   end
 
   it "reports every broken rule at once" do
@@ -106,6 +106,6 @@ RSpec.describe CageAssignment do
   it "reports a missing species as a model error instead of failing" do
     dinosaur = build(:dinosaur, species: nil)
     expect { assign(dinosaur) }.to raise_error(ActiveRecord::RecordInvalid)
-    expect(dinosaur.errors.attribute_names).to eq([:species])
+    expect(dinosaur.errors.attribute_names).to eq([ :species ])
   end
 end

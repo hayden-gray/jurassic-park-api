@@ -24,7 +24,7 @@ class CageAssignment
   attr_reader :dinosaur, :cage_id, :cage
 
   def failures
-    return ["must exist"] unless cage
+    return [ "must exist" ] unless cage
 
     failures = []
     failures << "is powered down" if cage.down?

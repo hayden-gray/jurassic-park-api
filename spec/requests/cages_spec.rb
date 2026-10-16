@@ -32,7 +32,7 @@ RSpec.describe "Cages", type: :request do
       active = create(:cage)
       create(:cage, :down)
       get "/cages", params: { filter: { power_status: "ACTIVE" } }
-      expect(response.parsed_body.map { |c| c["id"] }).to eq([active.id])
+      expect(response.parsed_body.map { |c| c["id"] }).to eq([ active.id ])
     end
 
     it "returns an empty list for an unknown power status filter" do
@@ -52,9 +52,8 @@ RSpec.describe "Cages", type: :request do
       create(:cage)
       down = create(:cage, :down)
       get "/cages", params: { filter: { power_status: "down" } }
-      expect(response.parsed_body.map { |c| c["id"] }).to eq([down.id])
+      expect(response.parsed_body.map { |c| c["id"] }).to eq([ down.id ])
     end
-
   end
 
   describe "GET /cages/:id" do

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe CageAssignment, "when two requests race for the last slot", type: :model do
   self.use_transactional_tests = false
 
-  after { [Dinosaur, Cage, Species].each(&:delete_all) }
+  after { [ Dinosaur, Cage, Species ].each(&:delete_all) }
 
   it "places only one" do
     cage = create(:cage, capacity: 1)

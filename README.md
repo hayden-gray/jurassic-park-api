@@ -1,7 +1,6 @@
 # Jurassic Park API
 
-JSON REST API for tracking the park's cages and the dinosaurs in them. Built for the
-PrizePicks Ruby on Rails back-end assessment.
+JSON REST API for tracking the park's cages and the dinosaurs in them.
 
 ## Stack
 
